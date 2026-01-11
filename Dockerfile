@@ -55,7 +55,8 @@ COPY --chown=appuser:appuser . .
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    FLASK_ENV=production
+    FLASK_ENV=production \
+    PORT=8080
 
 # Switch to non-root user
 USER appuser
@@ -68,4 +69,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8080/health', timeout=5)"
 
 # Run database migrations and start server
-CMD ["sh", "-c", "alembic upgrade head && gunicorn --bind 0.0.0.0:8080 --workers 4 --threads 2 --timeout 120 --access-logfile - --error-logfile - app:app"]
+CMD ["sh", "-c", "alembic upgrade head && gunicorn --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120 --access-logfile - --error-logfile - app:app"]
