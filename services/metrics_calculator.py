@@ -382,22 +382,29 @@ def aggregate_metrics_across_llms(
     citation_overview = {}
     rank_by_llms = {}
 
-    for llm_name, metrics in successful_llms.items():
-        # Build per-LLM dicts
-        mention_rate_by_llm[llm_name] = metrics.get("mentionRate", 0.0)
-        citations_by_llm[llm_name] = metrics.get("brandDomainCitationRate", 0.0)
-        citation_overview[llm_name] = metrics.get("citationsList", [])
+    # Build per-LLM dicts for ALL LLMs (including failed ones)
+    for llm_name, metrics in per_llm_metrics.items():
+        if "error" in metrics:
+            # Failed LLM - use default values
+            mention_rate_by_llm[llm_name] = 0.0
+            citations_by_llm[llm_name] = 0.0
+            citation_overview[llm_name] = []
+        else:
+            # Successful LLM - use actual values
+            mention_rate_by_llm[llm_name] = metrics.get("mentionRate", 0.0)
+            citations_by_llm[llm_name] = metrics.get("brandDomainCitationRate", 0.0)
+            citation_overview[llm_name] = metrics.get("citationsList", [])
 
-        # Collect for averages (only if not None)
-        if metrics.get("mentionRate") is not None:
-            mention_rates.append(metrics["mentionRate"])
-        if metrics.get("brandDomainCitationRate") is not None:
-            citation_rates.append(metrics["brandDomainCitationRate"])
-        if metrics.get("sentimentScore") is not None:
-            sentiment_scores.append(metrics["sentimentScore"])
-        if metrics.get("brandRank") is not None:
-            brand_ranks.append(metrics["brandRank"])
-            rank_by_llms[llm_name] = metrics["brandRank"]
+            # Collect for averages (only from successful LLMs, only if not None)
+            if metrics.get("mentionRate") is not None:
+                mention_rates.append(metrics["mentionRate"])
+            if metrics.get("brandDomainCitationRate") is not None:
+                citation_rates.append(metrics["brandDomainCitationRate"])
+            if metrics.get("sentimentScore") is not None:
+                sentiment_scores.append(metrics["sentimentScore"])
+            if metrics.get("brandRank") is not None:
+                brand_ranks.append(metrics["brandRank"])
+                rank_by_llms[llm_name] = metrics["brandRank"]
 
     # Calculate averages
     avg_mention_rate = (
