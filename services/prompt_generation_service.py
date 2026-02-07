@@ -40,7 +40,8 @@ Requirements:
 2. Questions should be diverse (different scenarios, use cases, price points)
 3. Do NOT mention "{brand_name}" in the questions - users don't know the answer yet
 4. Questions should be open-ended enough that multiple brands could be relevant answers
-5. Return ONLY the questions, one per line, numbered
+5. IMPORTANT: First determine the brand's primary market/country. Then generate questions from the perspective of a consumer in THAT market, using local context (e.g. local currency, local competitors, region-specific needs). For example, if the brand operates primarily in India, generate questions an Indian consumer would ask, mentioning India explicitly.
+6. Return ONLY the questions, one per line, numbered
 
 Example format:
 1. What is the best smartphone under $500?
